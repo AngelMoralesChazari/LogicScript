@@ -12,21 +12,32 @@ LogicScript separa claramente:
 | Aspecto | Valor |
 |---------|-------|
 | Formato de datos | `.lgs` v0.6 |
-| Implementación | Java 17+, sin dependencias externas |
+| Implementación | Java 25 (--release 25), sin dependencias externas |
 | Pruebas | `LogicScriptRegressionHarness` (~40 casos) |
 
 ## Compilar y ejecutar
 
 ```powershell
 .\compile.ps1
+```
+
+Usa **JDK 25** automáticamente si está en `C:\Program Files\Java\jdk-25.0.2` (o define `JAVA_HOME`).
+
+```powershell
 java -cp out logicscript.LogicScriptCli "si estudio apruebo"
 java -cp out logicscript.LogicScriptRegressionHarness
 ```
 
-Si `JAVA_HOME` no está definido:
+Si quieres forzar otra ruta de JDK:
 
 ```powershell
-.\compile.ps1 -JdkHome "C:\Program Files\Java\jdk-25"
+.\compile.ps1 -JdkHome "C:\Program Files\Java\jdk-25.0.2"
+```
+
+Otra versión de bytecode (opcional):
+
+```powershell
+.\compile.ps1 -Release 17
 ```
 
 ## Estructura del proyecto
