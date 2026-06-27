@@ -32,13 +32,23 @@ public final class VertautoService {
         return EvaluadorProposicional.evaluar(expr, mostrada);
     }
 
-    /** Traduce NL y evalúa la fórmula emitida. */
+    /** Traduce NL y evalúa la fórmula emitida (incluye pasos de traducción en el resultado). */
     public VertautoResult vertautoDesdeNl(String textoNatural) {
         LogicScriptResult traduccion = translateService.traducir(textoNatural);
         if (!traduccion.isExito()) {
             throw new IllegalArgumentException(traduccion.getMensaje());
         }
-        return vertautoClasica(traduccion.getFormula());
+        VertautoResult evaluacion = vertautoClasica(traduccion.getFormula());
+        return new VertautoResult(
+                evaluacion.getFormula(),
+                evaluacion.getDictamen(),
+                evaluacion.getAtomos(),
+                evaluacion.getFilasTabla(),
+                evaluacion.getPasosEvaluacion(),
+                textoNatural.trim(),
+                traduccion.getPasosDeAnalisis(),
+                traduccion.getProposiciones()
+        );
     }
 
     public VertautoResult vertauto(LogicExpr expr, String formulaMostrada) {

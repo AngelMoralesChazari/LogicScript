@@ -66,7 +66,6 @@ public final class VertautoCli {
         System.err.println("Uso:");
         System.err.println("  VertautoCli \"(p → q)\"");
         System.err.println("  VertautoCli --expr \"p or not p\"");
-        System.err.println("  VertautoCli --from-nl \"si estudio apruebo\"");
-        System.err.println("  VertautoCli --expr \"p or not p\" --extended");
+        System.err.println("  VertautoCli --from-nl \"si llueve llevo paraguas\" --extended");
     }
 }

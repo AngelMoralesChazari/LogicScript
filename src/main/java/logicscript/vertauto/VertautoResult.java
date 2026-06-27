@@ -2,10 +2,12 @@ package logicscript.vertauto;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Resultado de {@link VertautoService}: fórmula evaluada, dictamen y datos opcionales de tabla/pasos.
+ * Si la entrada fue lenguaje natural, {@link #getPasosTraduccion()} incluye lexemas, patrones, etc.
  */
 public final class VertautoResult {
 
@@ -13,20 +15,39 @@ public final class VertautoResult {
     private final TipoDictamen dictamen;
     private final List<String> atomos;
     private final List<String> filasTabla;
-    private final List<String> pasos;
+    private final List<String> pasosEvaluacion;
+    private final String textoNatural;
+    private final List<String> pasosTraduccion;
+    private final Map<String, String> proposiciones;
 
     public VertautoResult(
             String formula,
             TipoDictamen dictamen,
             List<String> atomos,
             List<String> filasTabla,
-            List<String> pasos
+            List<String> pasosEvaluacion
+    ) {
+        this(formula, dictamen, atomos, filasTabla, pasosEvaluacion, null, List.of(), Map.of());
+    }
+
+    public VertautoResult(
+            String formula,
+            TipoDictamen dictamen,
+            List<String> atomos,
+            List<String> filasTabla,
+            List<String> pasosEvaluacion,
+            String textoNatural,
+            List<String> pasosTraduccion,
+            Map<String, String> proposiciones
     ) {
         this.formula = Objects.requireNonNull(formula);
         this.dictamen = Objects.requireNonNull(dictamen);
         this.atomos = List.copyOf(atomos);
         this.filasTabla = List.copyOf(filasTabla);
-        this.pasos = List.copyOf(pasos);
+        this.pasosEvaluacion = List.copyOf(pasosEvaluacion);
+        this.textoNatural = textoNatural;
+        this.pasosTraduccion = pasosTraduccion == null ? List.of() : List.copyOf(pasosTraduccion);
+        this.proposiciones = proposiciones == null ? Map.of() : Collections.unmodifiableMap(proposiciones);
     }
 
     public String getFormula() {
@@ -45,8 +66,22 @@ public final class VertautoResult {
         return filasTabla;
     }
 
-    public List<String> getPasos() {
-        return pasos;
+    /** Pasos de tabla de verdad y dictamen. */
+    public List<String> getPasosEvaluacion() {
+        return pasosEvaluacion;
+    }
+
+    /** Pasos del pipeline {@code translate} (lexemas, patrones, lemas). Vacío si la entrada no fue NL. */
+    public List<String> getPasosTraduccion() {
+        return pasosTraduccion;
+    }
+
+    public String getTextoNatural() {
+        return textoNatural;
+    }
+
+    public Map<String, String> getProposiciones() {
+        return proposiciones;
     }
 
     /** Salida modo corto: {@code (p → q)  contingency} */
@@ -59,12 +94,28 @@ public final class VertautoResult {
     }
 
     public void imprimirExtendido(boolean steps, boolean table, boolean verdict) {
-        if (steps && !pasos.isEmpty()) {
-            System.out.println("=== Pasos ===");
-            for (String paso : pasos) {
-                System.out.println("  - " + paso);
+        if (steps) {
+            if (!pasosTraduccion.isEmpty()) {
+                System.out.println("=== Traducción (NL → fórmula) ===");
+                if (textoNatural != null && !textoNatural.isBlank()) {
+                    System.out.println("Entrada: " + textoNatural);
+                }
+                for (String paso : pasosTraduccion) {
+                    System.out.println("  - " + paso);
+                }
+                if (!proposiciones.isEmpty()) {
+                    System.out.println("Proposiciones: " + proposiciones);
+                }
+                System.out.println("Fórmula emitida: " + formula);
+                System.out.println();
             }
-            System.out.println();
+            if (!pasosEvaluacion.isEmpty()) {
+                System.out.println("=== Evaluación lógica ===");
+                for (String paso : pasosEvaluacion) {
+                    System.out.println("  - " + paso);
+                }
+                System.out.println();
+            }
         }
         if (table && !filasTabla.isEmpty()) {
             System.out.println("=== Tabla de verdad ===");

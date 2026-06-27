@@ -54,8 +54,16 @@ public final class VertautoHarness {
                     return r.getFilasTabla().size() >= 3;
                 });
 
+        fallos += verificar(
+                "nl_incluye_pasos_traduccion",
+                () -> {
+                    VertautoResult r = svc.vertautoDesdeNl("si llueve llevo paraguas");
+                    return !r.getPasosTraduccion().isEmpty()
+                            && r.getPasosTraduccion().stream().anyMatch(p -> p.contains("Lexemas"));
+                });
+
         if (fallos == 0) {
-            System.out.println("VertautoHarness: OK (6 casos).");
+            System.out.println("VertautoHarness: OK (7 casos).");
         } else {
             System.err.println("VertautoHarness: " + fallos + " fallo(s).");
             System.exit(1);
