@@ -19,8 +19,8 @@ LogicScript separa claramente:
 
 ```powershell
 .\compile.ps1
-java -cp out tautoteacher2.logicscript.LogicScriptCli "si estudio apruebo"
-java -cp out tautoteacher2.logicscript.LogicScriptRegressionHarness
+java -cp out logicscript.LogicScriptCli "si estudio apruebo"
+java -cp out logicscript.LogicScriptRegressionHarness
 ```
 
 Si `JAVA_HOME` no está definido:
@@ -33,8 +33,8 @@ Si `JAVA_HOME` no está definido:
 
 ```text
 LogicScript/
-├── src/main/java/tautoteacher2/
-│   ├── logicscript/     # motor, IR, CLI
+├── src/main/java/
+│   ├── logicscript/     # motor, IR, CLI, vertauto
 │   └── nlp/             # lexer, léxico .lgs, semántica
 ├── src/main/resources/logicscript/core.lgs
 ├── docs/                # especificación y plan de migración
@@ -61,7 +61,7 @@ Donde `p` = estudiar y `q` = aprobar (formas canónicas del léxico).
 
 ## Próximos pasos
 
-- Renombrar paquetes `tautoteacher2.*` → `org.logicscript.*`
+- Migrar a Maven/Gradle con `groupId` propio
 - Migrar a Maven o Gradle
 - Evolucionar `.lgs` a v1.0 con directivas `synonym`, `connector`, módulos
 

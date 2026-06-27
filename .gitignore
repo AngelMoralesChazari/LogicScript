@@ -1,0 +1,11 @@
+out/
+TautoTeacher2.0/
+.idea/
+.vscode/
+.VSCodeCounter/
+*.iml
+.DS_Store
+
+# Documentación local (no versionar en el repo remoto)
+documentacion LogicScript/
+docs/
