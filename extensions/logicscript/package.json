@@ -1,0 +1,28 @@
+{
+  "name": "logicscript",
+  "displayName": "LogicScript",
+  "description": "Resaltado de sintaxis para archivos LogicScript (.ls)",
+  "version": "0.1.0",
+  "publisher": "logicscript",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "logicscript",
+        "aliases": ["LogicScript", "logicscript"],
+        "extensions": [".ls"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "logicscript",
+        "scopeName": "source.logicscript",
+        "path": "./syntaxes/logicscript.tmLanguage.json"
+      }
+    ]
+  }
+}
