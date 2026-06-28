@@ -17,8 +17,10 @@ import logicscript.ls.ast.VertautoOptions;
 import logicscript.ls.ast.VertautoStmt;
 import logicscript.vertauto.VertautoResult;
 import logicscript.vertauto.VertautoService;
+import logicscript.vertauto.EvaluadorProposicional;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +41,11 @@ public final class LsInterpreter {
     public void ejecutar(LsProgram program) {
         LsValidator.validarOError(program);
         Map<String, String> nlTextos = new HashMap<>();
-        Map<String, String> atomEtiquetas = new HashMap<>();
+        Map<String, String> atomEtiquetas = new LinkedHashMap<>();
         Map<String, FormulaBinding> formulas = new HashMap<>();
 
         for (LsStmt stmt : program.statements()) {
+            LsAtomRegistry atomRegistry = new LsAtomRegistry(atomEtiquetas);
             if (stmt instanceof AtomDecl) {
                 AtomDecl a = (AtomDecl) stmt;
                 atomEtiquetas.put(a.name(), a.label());
@@ -51,13 +54,13 @@ public final class LsInterpreter {
                 nlTextos.put(n.name(), n.text());
             } else if (stmt instanceof LetDecl) {
                 LetDecl l = (LetDecl) stmt;
-                formulas.put(l.name(), evaluarTranslate(l.translate(), nlTextos));
+                formulas.put(l.name(), evaluarTranslate(l.translate(), nlTextos, atomRegistry));
             } else if (stmt instanceof FormulaDecl) {
                 FormulaDecl f = (FormulaDecl) stmt;
-                formulas.put(f.name(), evaluarFormula(f.expression()));
+                formulas.put(f.name(), evaluarFormula(f.expression(), atomRegistry));
             } else if (stmt instanceof VertautoStmt) {
                 VertautoStmt v = (VertautoStmt) stmt;
-                ejecutarVertauto(v, formulas);
+                ejecutarVertauto(v, formulas, atomRegistry);
             } else {
                 throw new IllegalStateException("Sentencia no contemplada: " + stmt.getClass());
             }
@@ -75,7 +78,11 @@ public final class LsInterpreter {
         ejecutar(program);
     }
 
-    private FormulaBinding evaluarTranslate(TranslateCall call, Map<String, String> nlTextos) {
+    private FormulaBinding evaluarTranslate(
+            TranslateCall call,
+            Map<String, String> nlTextos,
+            LsAtomRegistry atomRegistry
+    ) {
         if (call.moduleOverride() != null) {
             throw new LsRuntimeException("translate con módulo explícito aún no implementado: "
                     + call.moduleOverride());
@@ -85,17 +92,21 @@ public final class LsInterpreter {
         if (!traduccion.isExito()) {
             throw new LsRuntimeException("translate falló: " + traduccion.getMensaje());
         }
-        return FormulaBinding.desdeTraduccion(traduccion, texto);
+        return FormulaBinding.desdeTraduccion(traduccion, texto, atomRegistry);
     }
 
-    private FormulaBinding evaluarFormula(FormulaExpr expr) {
+    private FormulaBinding evaluarFormula(FormulaExpr expr, LsAtomRegistry atomRegistry) {
         LogicExpr logicExpr = LsFormulaBridge.toLogicExpr(expr);
-        String mostrada = LsFormulaBridge.toDisplayString(expr);
-        return FormulaBinding.desdeExpresion(logicExpr, mostrada);
+        String mostrada = LsFormulaBridge.emitirFormulaClasica(expr, atomRegistry);
+        return FormulaBinding.desdeExpresion(logicExpr, mostrada, atomRegistry);
     }
 
-    private void ejecutarVertauto(VertautoStmt stmt, Map<String, FormulaBinding> formulas) {
-        FormulaBinding binding = resolverFormula(stmt.target(), formulas);
+    private void ejecutarVertauto(
+            VertautoStmt stmt,
+            Map<String, FormulaBinding> formulas,
+            LsAtomRegistry atomRegistry
+    ) {
+        FormulaBinding binding = resolverFormula(stmt.target(), formulas, atomRegistry);
         VertautoResult resultado = binding.evaluar(vertautoService);
         VertautoOptions opts = stmt.options();
         if (!opts.steps() && !opts.table() && !opts.verdict()) {
@@ -105,7 +116,11 @@ public final class LsInterpreter {
         }
     }
 
-    private FormulaBinding resolverFormula(FormulaRef ref, Map<String, FormulaBinding> formulas) {
+    private FormulaBinding resolverFormula(
+            FormulaRef ref,
+            Map<String, FormulaBinding> formulas,
+            LsAtomRegistry atomRegistry
+    ) {
         if (ref.isVariable()) {
             FormulaBinding binding = formulas.get(ref.variableName());
             if (binding == null) {
@@ -113,7 +128,7 @@ public final class LsInterpreter {
             }
             return binding;
         }
-        return evaluarFormula(ref.inlineExpression());
+        return evaluarFormula(ref.inlineExpression(), atomRegistry);
     }
 
     private String resolverTexto(TextRef ref, Map<String, String> nlTextos) {
@@ -133,38 +148,53 @@ public final class LsInterpreter {
         private final String formulaMostrada;
         private final LogicScriptResult traduccion;
         private final String textoNatural;
+        private final LsAtomRegistry atomRegistry;
 
         private FormulaBinding(
                 String formulaClasica,
                 LogicExpr expr,
                 String formulaMostrada,
                 LogicScriptResult traduccion,
-                String textoNatural
+                String textoNatural,
+                LsAtomRegistry atomRegistry
         ) {
             this.formulaClasica = formulaClasica;
             this.expr = expr;
             this.formulaMostrada = formulaMostrada;
             this.traduccion = traduccion;
             this.textoNatural = textoNatural;
+            this.atomRegistry = atomRegistry == null ? LsAtomRegistry.vacio() : atomRegistry;
         }
 
-        static FormulaBinding desdeTraduccion(LogicScriptResult traduccion, String textoNatural) {
+        static FormulaBinding desdeTraduccion(
+                LogicScriptResult traduccion,
+                String textoNatural,
+                LsAtomRegistry atomRegistry
+        ) {
             return new FormulaBinding(
                     traduccion.getFormula(),
                     null,
                     traduccion.getFormula(),
                     traduccion,
-                    textoNatural
+                    textoNatural,
+                    atomRegistry
             );
         }
 
-        static FormulaBinding desdeExpresion(LogicExpr expr, String mostrada) {
-            return new FormulaBinding(null, expr, mostrada, null, null);
+        static FormulaBinding desdeExpresion(
+                LogicExpr expr,
+                String mostrada,
+                LsAtomRegistry atomRegistry
+        ) {
+            return new FormulaBinding(null, expr, mostrada, null, null, atomRegistry);
         }
 
         VertautoResult evaluar(VertautoService vertautoService) {
             if (traduccion != null) {
                 VertautoResult evaluacion = vertautoService.vertautoClasica(traduccion.getFormula());
+                Map<String, String> proposiciones = atomRegistry.proposicionesDesdeTraduccion(
+                        traduccion.getProposiciones()
+                );
                 return new VertautoResult(
                         evaluacion.getFormula(),
                         evaluacion.getDictamen(),
@@ -173,11 +203,26 @@ public final class LsInterpreter {
                         evaluacion.getPasosEvaluacion(),
                         textoNatural,
                         traduccion.getPasosDeAnalisis(),
-                        traduccion.getProposiciones()
+                        proposiciones
                 );
             }
             if (expr != null) {
-                return vertautoService.vertauto(expr, formulaMostrada);
+                VertautoResult evaluacion = vertautoService.vertauto(expr, formulaMostrada);
+                List<String> simbolos = EvaluadorProposicional.recolectarAtomos(expr);
+                Map<String, String> proposiciones = atomRegistry.proposicionesParaSimbolos(simbolos);
+                if (proposiciones.isEmpty()) {
+                    return evaluacion;
+                }
+                return new VertautoResult(
+                        evaluacion.getFormula(),
+                        evaluacion.getDictamen(),
+                        evaluacion.getAtomos(),
+                        evaluacion.getFilasTabla(),
+                        evaluacion.getPasosEvaluacion(),
+                        null,
+                        List.of(),
+                        proposiciones
+                );
             }
             return vertautoService.vertautoClasica(formulaClasica);
         }
