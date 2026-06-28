@@ -1,0 +1,37 @@
+# LogicScript — plantilla de ejercicio
+# 1. Copia este archivo: mi_ejercicio.ls
+# 2. Cambia "plantilla_ejercicio" por "mi_ejercicio" en la línea module
+# 3. java -cp out logicscript.ls.LscCli check mi_ejercicio.ls
+# 4. java -cp out logicscript.ls.LscCli run  mi_ejercicio.ls
+
+module plantilla_ejercicio
+
+use core
+
+# --- Patrón A: lenguaje natural → translate → vertauto ---
+# atom p = "..."
+# atom q = "..."
+# nl linea = "si llueve llevo paraguas"
+# let f = translate(linea)
+# vertauto f { steps table verdict }
+
+# --- Patrón B: fórmula simbólica → vertauto ---
+# atom p = "estudiar"
+# formula f = p or not p
+# vertauto f { steps table verdict }
+
+# --- Patrón C: tautología clásica (modo corto) ---
+# atom p = "estudiar"
+# formula tautologia = p or not p
+# vertauto tautologia
+
+# --- Patrón D: contradicción ---
+# atom p = "estudiar"
+# formula f = p and not p
+# vertauto f { steps table verdict }
+
+# --- Tu ejercicio (descomenta y edita) ---
+atom p = "proposicion_a"
+atom q = "proposicion_b"
+formula f = p impl q
+vertauto f { steps table verdict }
