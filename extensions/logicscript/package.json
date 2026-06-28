@@ -1,8 +1,8 @@
 {
   "name": "logicscript",
   "displayName": "LogicScript",
-  "description": "Resaltado de sintaxis para archivos LogicScript (.ls)",
-  "version": "0.1.0",
+  "description": "Resaltado de sintaxis y snippets para archivos LogicScript (.ls)",
+  "version": "0.2.0",
   "publisher": "logicscript",
   "engines": {
     "vscode": "^1.80.0"
@@ -22,6 +22,12 @@
         "language": "logicscript",
         "scopeName": "source.logicscript",
         "path": "./syntaxes/logicscript.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "logicscript",
+        "path": "./snippets/logicscript.code-snippets"
       }
     ]
   }

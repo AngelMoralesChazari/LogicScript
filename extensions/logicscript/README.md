@@ -1,33 +1,47 @@
 # LogicScript — extensión VS Code / Cursor
 
-Resaltado de sintaxis para archivos `.ls`.
+Resaltado de sintaxis y **snippets** para archivos `.ls`.
 
 ## Instalación (desarrollo local)
 
 1. Abre VS Code o Cursor.
-2. **Extensions** → menú `...` → **Install from VSIX...** no hace falta si usas carpeta local:
-3. **Command Palette** (`Ctrl+Shift+P`) → **Developer: Install Extension from Location...**
-4. Selecciona la carpeta `extensions/logicscript` de este repositorio.
-5. Recarga la ventana si te lo pide.
+2. **Ctrl+Shift+P** → **Developer: Install Extension from Location...**
+3. Selecciona la carpeta `extensions/logicscript` de este repositorio.
+4. **Recarga la ventana** (importante tras actualizar snippets).
 
-## Verificar
+## Snippets (escribe el prefijo + Tab)
 
-Abre `examples/ejercicio_lluvia.ls`: deben resaltarse `module`, `vertauto`, `and`, comentarios `#`, cadenas `"..."`.
+| Prefijo | Inserta |
+|---------|---------|
+| `lsprog` / `programa` | `module` + `use core` (module = nombre del archivo) |
+| `use` | `use core` |
+| `atom` | `atom p = "etiqueta"` |
+| `nl` | `nl nombre = "texto"` |
+| `lettr` / `translate` | `let f = translate(variable_nl)` |
+| `lettrl` | `let f = translate("literal")` |
+| `formula` / `form` | `formula f = ...` |
+| `impl` | `formula f = p impl q` |
+| `tauto` | tautología `p or not p` + vertauto |
+| `contra` | contradicción `p and not p` + vertauto |
+| `vertauto` / `va` | modo corto |
+| `vax` | `vertauto f { steps table verdict }` |
+| `lsnl` | ejercicio completo NL → translate → vertauto |
+| `lsform` | ejercicio fórmula simbólica + vertauto |
+
+Documentación completa: `documentacion LogicScript/EXTENSION-VSCODE.md`
 
 ## Tareas integradas (opcional)
 
-Copia los archivos de `tooling/vscode/` a `.vscode/` en la raíz del proyecto:
-
 ```powershell
-Copy-Item -Recurse tooling/vscode/* .vscode/
+New-Item -ItemType Directory -Force .vscode
+Copy-Item tooling/vscode/tasks.json .vscode/
+Copy-Item tooling/vscode/settings.json.example .vscode/settings.json
 ```
-
-Tareas disponibles (`Ctrl+Shift+B` o **Tasks: Run Task**):
 
 | Tarea | Acción |
 |-------|--------|
-| LogicScript: check archivo actual | `lsc check` sobre el `.ls` abierto |
-| LogicScript: run archivo actual | `lsc run` sobre el `.ls` abierto |
+| LogicScript: check archivo actual | `lsc check` |
+| LogicScript: run archivo actual | `lsc run` |
 | LogicScript: compilar proyecto | `compile.ps1` |
 
-Requisito: haber ejecutado `.\compile.ps1` antes.
+Requisito: `.\compile.ps1` ejecutado al menos una vez.
