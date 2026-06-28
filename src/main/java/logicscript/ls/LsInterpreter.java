@@ -17,14 +17,12 @@ import logicscript.ls.ast.VertautoOptions;
 import logicscript.ls.ast.VertautoStmt;
 import logicscript.vertauto.VertautoResult;
 import logicscript.vertauto.VertautoService;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class LsInterpreter {
-
-    private static final Set<String> MODULOS_CONOCIDOS = Set.of("core");
 
     private final LogicScriptService translateService;
     private final VertautoService vertautoService;
@@ -39,7 +37,7 @@ public final class LsInterpreter {
     }
 
     public void ejecutar(LsProgram program) {
-        validarModulos(program);
+        LsValidator.validarOError(program);
         Map<String, String> nlTextos = new HashMap<>();
         Map<String, String> atomEtiquetas = new HashMap<>();
         Map<String, FormulaBinding> formulas = new HashMap<>();
@@ -69,20 +67,12 @@ public final class LsInterpreter {
     public void ejecutarArchivo(String ruta) {
         String source = LsSourceLoader.leer(ruta);
         LsProgram program = LsParser.parse(source);
+        List<String> errores = new ArrayList<>();
+        LsValidator.validarArchivoConvencion(ruta, program.moduleName(), errores);
+        if (!errores.isEmpty()) {
+            throw new LsValidationException(errores);
+        }
         ejecutar(program);
-    }
-
-    private void validarModulos(LsProgram program) {
-        Set<String> desconocidos = new HashSet<>();
-        for (String use : program.uses()) {
-            if (!MODULOS_CONOCIDOS.contains(use)) {
-                desconocidos.add(use);
-            }
-        }
-        if (!desconocidos.isEmpty()) {
-            throw new LsRuntimeException("Módulo(s) desconocido(s): " + desconocidos
-                    + ". En v1 solo está soportado: core");
-        }
     }
 
     private FormulaBinding evaluarTranslate(TranslateCall call, Map<String, String> nlTextos) {
