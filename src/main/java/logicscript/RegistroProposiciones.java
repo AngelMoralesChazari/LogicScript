@@ -29,6 +29,17 @@ public final class RegistroProposiciones {
         return Collections.unmodifiableMap(new LinkedHashMap<>(claveASimbolo));
     }
 
+    /**
+     * Pre-registra un átomo declarado en fuente {@code .ls}: el símbolo {@code p} y su etiqueta NL.
+     */
+    public void registrarAtomoDeclarado(String simbolo, String etiquetaNl) {
+        String sym = simbolo.trim();
+        claveASimbolo.put(sym, sym);
+        if (etiquetaNl != null && !etiquetaNl.isBlank()) {
+            claveASimbolo.put(etiquetaNl.trim(), sym);
+        }
+    }
+
     private static String siguienteSimbolo(int indice) {
         if (indice < SIMBOLOS.length) {
             return String.valueOf(SIMBOLOS[indice]);
