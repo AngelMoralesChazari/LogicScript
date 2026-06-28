@@ -10,13 +10,13 @@ public final class LsInterpreterHarness {
     public static void main(String[] args) {
         int fallos = 0;
         fallos += probarParser();
-        fallos += probarEjecucion("examples/ejercicio_lluvia.ls", "contingency");
-        fallos += probarEjecucion("examples/tautologia_estudio.ls", "tautology");
+        fallos += probarEjecucion("examples/ejercicio_lluvia.ls", "contingency", "llueve=p", "paraguas=q");
+        fallos += probarEjecucion("examples/tautologia_estudio.ls", "tautology", "estudio=p");
         if (fallos > 0) {
             System.err.println("LsInterpreterHarness: " + fallos + " fallo(s)");
             System.exit(1);
         }
-        System.out.println("LsInterpreterHarness: OK (" + (3) + " casos)");
+        System.out.println("LsInterpreterHarness: OK (3 casos)");
     }
 
     private static int probarParser() {
@@ -39,7 +39,7 @@ public final class LsInterpreterHarness {
         }
     }
 
-    private static int probarEjecucion(String archivo, String dictamenEsperado) {
+    private static int probarEjecucion(String archivo, String... fragmentosEsperados) {
         try {
             java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
             var originalOut = System.out;
@@ -50,10 +50,12 @@ public final class LsInterpreterHarness {
                 System.setOut(originalOut);
             }
             String salida = buffer.toString(java.nio.charset.StandardCharsets.UTF_8);
-            if (!salida.contains(dictamenEsperado)) {
-                System.err.println(archivo + ": se esperaba dictamen '" + dictamenEsperado + "'");
-                System.err.println(salida);
-                return 1;
+            for (String fragmento : fragmentosEsperados) {
+                if (!salida.contains(fragmento)) {
+                    System.err.println(archivo + ": se esperaba '" + fragmento + "' en la salida");
+                    System.err.println(salida);
+                    return 1;
+                }
             }
             return 0;
         } catch (RuntimeException e) {
