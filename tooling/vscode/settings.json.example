@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.ls": "logicscript"
+  },
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true
+}

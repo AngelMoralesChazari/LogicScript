@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "LogicScript: compilar proyecto",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/compile.ps1"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "LogicScript: check archivo actual",
+      "type": "shell",
+      "command": "java",
+      "args": [
+        "-cp",
+        "out",
+        "logicscript.ls.LscCli",
+        "check",
+        "${file}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "LogicScript: run archivo actual",
+      "type": "shell",
+      "command": "java",
+      "args": [
+        "-cp",
+        "out",
+        "logicscript.ls.LscCli",
+        "run",
+        "${file}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
