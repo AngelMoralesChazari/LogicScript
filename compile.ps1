@@ -83,6 +83,7 @@ try {
     Write-Host "  LSC check: & `"$java`" -cp out logicscript.ls.LscCli check examples/ejercicio_lluvia.ls"
     Write-Host "  LSC test:  & `"$java`" -cp out logicscript.ls.LsInterpreterHarness"
     Write-Host "  LSC check test: & `"$java`" -cp out logicscript.ls.LsCheckHarness"
+    Write-Host "  Plantilla:   copiar examples/plantilla_ejercicio.ls y renombrar module"
 }
 finally {
     Pop-Location

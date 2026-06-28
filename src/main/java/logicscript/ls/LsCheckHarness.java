@@ -10,6 +10,7 @@ public final class LsCheckHarness {
 
     public static void main(String[] args) {
         int fallos = 0;
+        fallos += probarOk("examples/plantilla_ejercicio.ls");
         fallos += probarOk("examples/ejercicio_lluvia.ls");
         fallos += probarOk("examples/tautologia_estudio.ls");
         fallos += probarErrorEnFuente(
@@ -46,7 +47,7 @@ public final class LsCheckHarness {
             System.err.println("LsCheckHarness: " + fallos + " fallo(s)");
             System.exit(1);
         }
-        System.out.println("LsCheckHarness: OK (6 casos)");
+        System.out.println("LsCheckHarness: OK (7 casos)");
     }
 
     private static int probarOk(String archivo) {

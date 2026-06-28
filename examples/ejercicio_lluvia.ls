@@ -1,5 +1,5 @@
 # LogicScript v1.0 — ejemplo canónico: implicación desde lenguaje natural
-# Referencia: documentacion LogicScript/Language-v1.0.md
+# Guía: documentacion LogicScript/GUIA-RAPIDA-EJERCICIOS.md
 # Ejecutar: java -cp out logicscript.ls.LscCli run examples/ejercicio_lluvia.ls
 
 module ejercicio_lluvia
