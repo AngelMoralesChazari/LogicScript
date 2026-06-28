@@ -1,4 +1,4 @@
-# LogicScript — plantilla de ejercicio
+# LogicScript — plantilla de ejercicio (alternativa: snippet `lsprog` o `lsnl` en el editor)
 # 1. Copia este archivo: mi_ejercicio.ls
 # 2. Cambia "plantilla_ejercicio" por "mi_ejercicio" en la línea module
 # 3. java -cp out logicscript.ls.LscCli check mi_ejercicio.ls
