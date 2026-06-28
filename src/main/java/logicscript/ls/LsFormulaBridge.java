@@ -2,6 +2,7 @@ package logicscript.ls;
 
 import logicscript.ir.AndExpr;
 import logicscript.ir.AtomExpr;
+import logicscript.ir.EmitidorFormula;
 import logicscript.ir.EquivExpr;
 import logicscript.ir.ImpExpr;
 import logicscript.ir.LogicExpr;
@@ -12,6 +13,8 @@ import logicscript.ls.ast.BinaryExpr;
 import logicscript.ls.ast.BinaryOp;
 import logicscript.ls.ast.FormulaExpr;
 import logicscript.ls.ast.NotExpr;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class LsFormulaBridge {
 
@@ -36,6 +39,12 @@ public final class LsFormulaBridge {
             };
         }
         throw new IllegalStateException("Expresión no contemplada: " + expr.getClass());
+    }
+
+    public static String emitirFormulaClasica(FormulaExpr expr, LsAtomRegistry atomos) {
+        LogicExpr logicExpr = toLogicExpr(expr);
+        List<String> pasos = new ArrayList<>();
+        return EmitidorFormula.emitir(logicExpr, atomos.toRegistroProposiciones(), pasos);
     }
 
     public static String toDisplayString(FormulaExpr expr) {
