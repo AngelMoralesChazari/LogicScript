@@ -1,8 +1,6 @@
 # LogicScript v1.0 — ejemplo canónico: tautología clásica p ∨ ¬p
 # Referencia: documentacion LogicScript/Language-v1.0.md
-# Estado: especificación; requiere intérprete/compilador .ls (pendiente).
-# Ejecución manual equivalente hoy:
-#   java -cp out logicscript.vertauto.VertautoCli --expr "p or not p"
+# Ejecutar: java -cp out logicscript.ls.LscCli run examples/tautologia_estudio.ls
 
 module tautologia_estudio
 

@@ -79,6 +79,8 @@ try {
     Write-Host "  Vertauto:  & `"$java`" -cp out logicscript.vertauto.VertautoCli --expr `"p or not p`""
     Write-Host "  Vertauto NL: & `"$java`" -cp out logicscript.vertauto.VertautoCli --from-nl `"si llueve llevo paraguas`""
     Write-Host "  Tests:     & `"$java`" -cp out logicscript.vertauto.VertautoHarness"
+    Write-Host "  LSC run:   & `"$java`" -cp out logicscript.ls.LscCli run examples/ejercicio_lluvia.ls"
+    Write-Host "  LSC test:  & `"$java`" -cp out logicscript.ls.LsInterpreterHarness"
 }
 finally {
     Pop-Location
