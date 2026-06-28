@@ -108,6 +108,11 @@ public final class VertautoResult {
                 }
                 System.out.println("Fórmula emitida: " + formula);
                 System.out.println();
+            } else if (!proposiciones.isEmpty()) {
+                System.out.println("=== Átomos declarados ===");
+                System.out.println("Proposiciones: " + proposiciones);
+                System.out.println("Fórmula: " + formula);
+                System.out.println();
             }
             if (!pasosEvaluacion.isEmpty()) {
                 System.out.println("=== Evaluación lógica ===");

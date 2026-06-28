@@ -68,7 +68,7 @@ public final class EvaluadorProposicional {
         return new VertautoResult(formulaMostrada, dictamen, atomos, filasTabla, pasos);
     }
 
-    static List<String> recolectarAtomos(LogicExpr expr) {
+    public static List<String> recolectarAtomos(LogicExpr expr) {
         Set<String> set = new LinkedHashSet<>();
         recolectarAtomosRec(expr, set);
         List<String> lista = new ArrayList<>(set);
