@@ -12,11 +12,12 @@ public final class LsInterpreterHarness {
         fallos += probarParser();
         fallos += probarEjecucion("examples/ejercicio_lluvia.ls", "contingency", "llueve=p", "paraguas=q");
         fallos += probarEjecucion("examples/tautologia_estudio.ls", "tautology", "estudio=p");
+        fallos += probarEjecucion("examples/translate_literal.ls", "contingency", "estudio=p", "apruebo=q");
         if (fallos > 0) {
             System.err.println("LsInterpreterHarness: " + fallos + " fallo(s)");
             System.exit(1);
         }
-        System.out.println("LsInterpreterHarness: OK (3 casos)");
+        System.out.println("LsInterpreterHarness: OK (4 casos)");
     }
 
     private static int probarParser() {
