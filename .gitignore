@@ -1,6 +1,7 @@
 out/
 target/
 *.jar
+*.vsix
 errores.txt
 TautoTeacher2.0/
 .idea/

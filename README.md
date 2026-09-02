@@ -1,79 +1,196 @@
 # LogicScript
 
-Lenguaje de programación **declarativo** para traducir un subconjunto controlado de español a **fórmulas de lógica proposicional**.
+[![JitPack](https://jitpack.io/v/AngelMoralesChazari/LogicScript.svg)](https://jitpack.io/#AngelMoralesChazari/LogicScript)
+[![Java](https://img.shields.io/badge/Java-17%2B-blue.svg)](https://adoptium.net/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 
-LogicScript separa claramente:
+Lenguaje de programación **declarativo** y motor simbólico para formalizar un subconjunto controlado de **lenguaje natural (español)** en **fórmulas de lógica proposicional** y evaluar automáticamente sus tablas de verdad.
 
-- **Datos** — archivos `.lgs` con reglas léxicas (`lemma`, `lexrule`) y semánticas (`pattern`)
-- **Motor** — runtime Java que interpreta esas reglas y produce una IR (árbol lógico) y una fórmula simbólica
+---
 
-## Estado actual
+## ⚡ El lenguaje puro (`.ls`) en acción
 
-| Aspecto | Valor |
-|---------|-------|
-| Formato de datos | `.lgs` v0.6 |
-| Implementación | Java 25 (--release 25), sin dependencias externas |
-| Pruebas | `LogicScriptRegressionHarness` (~40 casos) |
+Escribe tu lógica en un archivo con extensión `.ls` (por ejemplo, `ejercicio.ls`):
 
-## Compilar y ejecutar
+```ls
+module ejercicio
+use core
 
-```powershell
-.\compile.ps1
+atom p = "llueve"
+atom q = "paraguas"
+
+nl linea = "si llueve llevo paraguas"
+let implicacion = translate(linea)
+
+vertauto implicacion {
+    steps
+    table
+    verdict
+}
 ```
 
-Usa **JDK 25** automáticamente si está en `C:\Program Files\Java\jdk-25.0.2` (o define `JAVA_HOME`).
+### Ejecutar en consola:
 
-```powershell
-java -cp out logicscript.LogicScriptCli "si estudio apruebo"
-java -cp out logicscript.LogicScriptRegressionHarness
+```bash
+java -jar logicscript.jar run ejercicio.ls
 ```
 
-Si quieres forzar otra ruta de JDK:
+### Salida generada:
 
-```powershell
-.\compile.ps1 -JdkHome "C:\Program Files\Java\jdk-25.0.2"
+```text
+=== LOGICSCRIPT RUN: ejercicio.ls ===
+[TRANSLATE] linea -> (p -> q)
+  Pasos:
+    1. Entrada normalizada: 'si llueve llevo paraguas'
+    2. Tokenizado: 5 tokens
+    3. Patron coincidente: condicional_estandar
+    4. Formulas proposicionales detectadas:
+       - llueve -> p
+       - paraguas -> q
+    5. IR construido: ImpExpr
+    6. Formula emitida: (p -> q)
+[VERTAUTO] implicacion
+  Formula: (p -> q)
+  Proposiciones:
+    p: llueve
+    q: paraguas
+  Tabla de verdad:
+    p | q | (p -> q)
+    --+---+---------
+    V | V |    V    
+    V | F |    F    
+    F | V |    V    
+    F | F |    V    
+  Dictamen: CONTINGENCY (filas: 4, verdaderas: 3, falsas: 1)
+=== FIN (0 advertencias) ===
 ```
 
-Otra versión de bytecode (opcional):
+---
+
+## 🚀 Inicio rápido (Lenguaje Puro)
+
+Si eres estudiante o docente y **solo quieres usar el lenguaje** sin programar en Java:
+
+### 1. Descarga el intérprete
+1. Ve a la sección de **[Releases](https://github.com/AngelMoralesChazari/LogicScript/releases)**.
+2. Descarga el archivo **`logicscript.jar`**.
+3. *(Requiere tener instalado Java 17 o superior).*
+
+### 2. Ejecuta tus programas
+* **Ejecutar un script:**
+  ```bash
+  java -jar logicscript.jar run tu_programa.ls
+  ```
+* **Verificar sintaxis (sin ejecutar):**
+  ```bash
+  java -jar logicscript.jar check tu_programa.ls
+  ```
+
+### 3. Extensión oficial para Visual Studio Code
+Para tener **coloreado de sintaxis**, **snippets** y autocompletado:
+1. Descarga `logicscript-0.2.0.vsix` desde los Releases o desde `extensions/logicscript/`.
+2. En VS Code, ve a la pestaña **Extensions** (`Ctrl + Shift + X`).
+3. Haz clic en el menú de tres puntos `...` arriba a la derecha y selecciona **"Install from VSIX..."**.
+4. ¡Listo! Cualquier archivo `.ls` tendrá resaltado nativo.
+
+---
+
+## ☕ Uso como Librería en Java (Para Desarrolladores)
+
+Si eres desarrollador y deseas integrar el motor de LogicScript en tus propias aplicaciones, tutores inteligentes o evaluadores:
+
+### 1. Agregar dependencia (JitPack)
+
+#### En Maven (`pom.xml`):
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.AngelMoralesChazari</groupId>
+        <artifactId>LogicScript</artifactId>
+        <version>v0.6.1</version>
+    </dependency>
+</dependencies>
+```
+
+#### En Gradle (`build.gradle`):
+```groovy
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.AngelMoralesChazari:LogicScript:v0.6.1'
+}
+```
+
+---
+
+### 2. Código Java: Traducir lenguaje natural a fórmula
+
+```java
+import logicscript.LogicScriptService;
+import logicscript.LogicScriptResult;
+
+public class App {
+    public static void main(String[] args) {
+        LogicScriptService ls = new LogicScriptService();
+
+        LogicScriptResult res = ls.traducir("si estudio apruebo");
+
+        if (res.isExito()) {
+            System.out.println("Fórmula: " + res.getFormula()); 
+            // Salida: (p → q)
+            System.out.println("Proposiciones: " + res.getProposiciones()); 
+            // Salida: {estudio=p, apruebo=q}
+        } else {
+            System.err.println("Error: " + res.getMensaje());
+        }
+    }
+}
+```
+
+---
+
+### 3. Código Java: Ejecutar archivos `.ls` completos (Modo Embebido)
+
+También puedes interpretar scripts `.ls` completos directamente desde tu aplicación Java:
+
+```java
+import logicscript.ls.LsInterpreter;
+
+public class EvaluadorScript {
+    public static void main(String[] args) {
+        LsInterpreter interpreter = new LsInterpreter();
+        // Ejecuta el archivo e imprime el análisis y tabla de verdad
+        interpreter.ejecutarArchivo("ejercicio.ls");
+    }
+}
+```
+
+---
+
+## 🛠️ Compilación desde el código fuente
+
+Si deseas contribuir o modificar el motor:
 
 ```powershell
+# Usando Maven (genera el JAR en target/)
+mvn clean package
+
+# O usando el script nativo de PowerShell
 .\compile.ps1 -Release 17
 ```
 
-## Estructura del proyecto
+---
 
-```text
-LogicScript/
-├── src/main/java/
-│   ├── logicscript/     # motor, IR, CLI, vertauto
-│   └── nlp/             # lexer, léxico .lgs, semántica
-├── src/main/resources/logicscript/core.lgs
-├── docs/                # especificación y plan de migración
-└── compile.ps1
-```
+## 📄 Licencia
 
-## Documentación
-
-| Archivo | Contenido |
-|---------|-----------|
-| [docs/FILOSOFIA-Y-OBJETIVO.txt](docs/FILOSOFIA-Y-OBJETIVO.txt) | Visión y filosofía del lenguaje |
-| [docs/SINTAXIS-DSL-RESUMEN.md](docs/SINTAXIS-DSL-RESUMEN.md) | Referencia rápida de `.lgs` |
-| [docs/spec/LogicScript.md](docs/spec/LogicScript.md) | Libro blanco del pseudolenguaje |
-| [docs/INVENTARIO-CLASES-JAVA.md](docs/INVENTARIO-CLASES-JAVA.md) | Mapa del código Java |
-
-## Ejemplo
-
-```
-Entrada:  si estudio apruebo
-Salida:   (p → q)
-```
-
-Donde `p` = estudiar y `q` = aprobar (formas canónicas del léxico).
-
-## Próximos pasos
-
-- Migrar a Maven/Gradle con `groupId` propio
-- Migrar a Maven o Gradle
-- Evolucionar `.lgs` a v1.0 con directivas `synonym`, `connector`, módulos
-
-Ver [docs/PLAN-MIGRACION-PROYECTO-INDEPENDIENTE.md](docs/PLAN-MIGRACION-PROYECTO-INDEPENDIENTE.md) para el plan completo.
+Este proyecto está bajo la Licencia **Apache 2.0**. Consulta el archivo `LICENSE` para más detalles.
